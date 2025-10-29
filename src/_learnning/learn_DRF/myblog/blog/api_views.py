@@ -1,7 +1,9 @@
 # blog/api_views.py
-from rest_framework import generics, permissions, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import generics, permissions, status, viewsets
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 from .models import Post, Comment, Category
 from .serializers import (
     PostSerializer, PostCreateSerializer,
@@ -45,29 +47,15 @@ class CategoryListAPIView(generics.ListAPIView):
     serializer_class = CategorySerializer
 
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def approve_comment(request, comment_id):
-    try:
-        comment = Comment.objects.get(id=comment_id)
-        comment.approved = True
-        comment.save()
-        return Response({'status': 'comment approved'})
-    except Comment.DoesNotExist:
-        return Response(
-            {'error': 'Comment not found'},
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-
-# blog/api_views.py (继续)
-from rest_framework import viewsets
-from rest_framework.decorators import action
-
-
+# 视图集版本
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['category', 'author', 'status']
+    search_fields = ['title', 'content']
+    ordering_fields = ['created_at', 'updated_at', 'views_count']
+    ordering = ['-created_at']
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -84,23 +72,17 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
-# blog/api_views.py
-from rest_framework.pagination import PageNumberPagination
-from rest_framework import filters
-from django_filters.rest_framework import DjangoFilterBackend
 
-class PostPagination(PageNumberPagination):
-    page_size = 5
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-
-class PostListAPIView(generics.ListCreateAPIView):
-    queryset = Post.objects.filter(status='published')
-    serializer_class = PostSerializer
-    pagination_class = PostPagination
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['category', 'author']
-    search_fields = ['title', 'content']
-    ordering_fields = ['created_at', 'updated_at']
-    ordering = ['-created_at']
-
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def approve_comment(request, comment_id):
+    try:
+        comment = Comment.objects.get(id=comment_id)
+        comment.approved = True
+        comment.save()
+        return Response({'status': 'comment approved'})
+    except Comment.DoesNotExist:
+        return Response(
+            {'error': 'Comment not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )

@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 import itertools
 
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -36,30 +37,42 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-    # 在 Django 中，prepopulated_fields 只在 Admin 后台有效，在 shell 或普通视图中不会自动生成。
-    # 我们需要确保在模型层面处理 slug 的自动生成。
+    #
+    # # 在 Django 中，prepopulated_fields 只在 Admin 后台有效，在 shell 或普通视图中不会自动生成。
+    # # 我们需要确保在模型层面处理 slug 的自动生成。
     def save(self, *args, **kwargs):
-        """重写save方法，确保slug自动生成"""
+        """重写save方法，确保slug自动生成，避免递归"""
+        # 检查是否需要生成slug
         if not self.slug:
-            self.slug = self.generate_unique_slug()
-        super().save(*args, **kwargs)
+            # 生成slug但不立即保存
+            self.slug = self._generate_unique_slug()
 
-    def generate_unique_slug(self):
-        """生成唯一的slug"""
-        # 基于标题生成基础slug
+        # 检查是否是新建对象
+        if self._state.adding:
+            # 新建对象，直接调用父类save
+            super().save(*args, **kwargs)
+        else:
+            # 更新对象，确保不触发递归
+            # 使用update_fields来明确指定更新的字段
+            super().save(update_fields=['slug'] if not any(
+                kwargs.get(key) for key in ['force_insert', 'force_update', 'update_fields']) else None, *args,
+                         **kwargs)
+
+    def _generate_unique_slug(self):
+        """生成唯一的slug（内部方法）"""
         base_slug = slugify(self.title)
-        if not base_slug:  # 如果标题无法生成slug（比如全是中文标点）
+        if not base_slug:  # 如果标题无法生成slug
             base_slug = 'post'
 
-        # 如果基础slug不重复，直接使用
-        if not Post.objects.filter(slug=base_slug).exists():
-            return base_slug
+        slug = base_slug
+        counter = 1
 
-        # 如果重复，添加数字后缀直到找到不重复的slug
-        for i in itertools.count(1):
-            candidate_slug = f"{base_slug}-{i}"
-            if not Post.objects.filter(slug=candidate_slug).exists():
-                return candidate_slug
+        # 检查slug是否唯一
+        while Post.objects.filter(slug=slug).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+
+        return slug
 
     def get_absolute_url(self):
         return reverse('post_detail', kwargs={'pk': self.pk})
