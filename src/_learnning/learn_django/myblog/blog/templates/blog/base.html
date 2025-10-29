@@ -1,0 +1,25 @@
+<!-- blog/templates/blog/base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}我的博客{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .post { border: 1px solid #ddd; padding: 20px; margin: 10px 0; }
+        .comment { background: #f9f9f9; padding: 10px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="{% url 'post_list' %}">我的博客</a></h1>
+        <nav>
+            <a href="{% url 'post_list' %}">首页</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>
