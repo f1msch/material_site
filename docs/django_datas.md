@@ -1,18 +1,23 @@
 ### 方法一：通过Django管理员后台添加
 创建超级用户
-python manage.py createsuperuser
+```
+$ python manage.py createsuperuser
 用户名: admin
 邮箱: admin@example.com
 密码: ********
 密码(重复): ********
 Superuser created successfully.
 登录管理员后台
-python manage.py runserver
+```
+```
+$ python manage.py runserver
+```
 http://127.0.0.1:8000/admin/
 ### 方法二：使用Django Shell批量添加测试数据
-python manage.py shell
+```
+$ python manage.py shell
 
-```python
+>> 
 from django.contrib.auth.models import User
 from blog.models import Category, Post
 from django.utils import timezone
@@ -138,8 +143,10 @@ for post_data in posts_data:
     print(f"创建文章: {post.title}")
 
 print("所有测试数据创建完成！")
+
+# 退出Django Shell
+$ exit()  
 ```
-exit()  # 退出Django Shell
 
 ### 方法三：创建自定义管理命令
 ```python
@@ -216,6 +223,8 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS('示例数据添加完成！'))
 ```
-python manage.py add_sample_data
+```
+$ python manage.py add_sample_data
+```
 
 ### 通过编写一个数据迁移脚本或使用 fixtures
