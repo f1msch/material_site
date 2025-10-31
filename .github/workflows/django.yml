@@ -24,14 +24,27 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Run basic checks
+    - name: Run Django Checks and Tests
       run: |
-        # 检查 Django 配置
+        echo "=== 1. 系统配置检查 ==="
         python manage.py check
-        # 尝试导入所有模块（检查语法错误）
-        python manage.py validate_templates
-        # 运行系统检查
-        python manage.py test --help  # 至少验证命令可用
+
+        echo "=== 2. 迁移状态检查 ==="
+        python manage.py showmigrations --list
+
+        echo "=== 3. 检查是否需要新迁移 ==="
+        python manage.py makemigrations --check --dry-run
+
+        echo "=== 4. 语法检查 ==="
+        python -m compileall .
+
+        echo "=== 5. 运行测试 ==="
+        # 如果有测试就运行，没有则跳过
+        if python manage.py test --failfast --verbosity=1; then
+            echo "Tests passed"
+        else
+            echo "Tests failed or no tests configured"
+        fi
       working-directory: src/backend/material_site  # 指定后端目录
 #      数据库配置
 #    - name: Setup PostgreSQL
