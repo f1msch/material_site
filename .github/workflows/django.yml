@@ -7,8 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-
+  backend-test:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -33,3 +32,22 @@ jobs:
         python manage.py validate_templates
         # 运行系统检查
         python manage.py test --help  # 至少验证命令可用
+      working-directory: material_site/src/backend  # 指定后端目录
+
+  frontend-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Frontend Dependencies
+        run: npm install
+        working-directory: material_site/src/frontend  # 指定前端目录
+      - name: Run Lint Check
+        run: npm run lint
+        working-directory: material_site/src/frontend  # 在前端目录运行lint
+      - name: Run Build Check
+        run: npm run build
+        working-directory: material_site/src/frontend  # 验证前端能否正常构建
