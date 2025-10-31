@@ -32,7 +32,15 @@ jobs:
         python manage.py validate_templates
         # 运行系统检查
         python manage.py test --help  # 至少验证命令可用
-      working-directory: material_site/src/backend  # 指定后端目录
+      working-directory: src/backend  # 指定后端目录
+#      数据库配置
+#    - name: Setup PostgreSQL
+#      uses: harmon758/postgresql-action@v1
+#      with:
+#        postgresql version: '13'
+#        postgresql db: 'test_db'
+#        postgresql user: 'postgres'
+#        postgresql password: 'postgres'
 
   frontend-check:
     runs-on: ubuntu-latest
@@ -44,10 +52,10 @@ jobs:
           node-version: '18'
       - name: Install Frontend Dependencies
         run: npm install
-        working-directory: material_site/src/frontend  # 指定前端目录
+        working-directory: src/frontend  # 指定前端目录
       - name: Run Lint Check
         run: npm run lint
-        working-directory: material_site/src/frontend  # 在前端目录运行lint
+        working-directory: src/frontend  # 在前端目录运行lint
       - name: Run Build Check
         run: npm run build
-        working-directory: material_site/src/frontend  # 验证前端能否正常构建
+        working-directory: src/frontend  # 验证前端能否正常构建
