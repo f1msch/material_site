@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from materials.models import Category, Material, MaterialTag
+from ...models import Category, Material, MaterialTag
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 import os

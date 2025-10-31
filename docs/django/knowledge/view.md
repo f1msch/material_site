@@ -1,169 +1,3 @@
-### Django模型中常见的字段类型
-* **CharField**
-
-用于存储较短的字符串（如标题、名称等）
-
-必须指定max_length参数，表示最大字符数
-
-对应数据库中的VARCHAR列
-
-* **TextField**
-
-用于存储大段文本，如文章内容、描述等
-
-不需要指定最大长度，适合存储任意长度的文本
-
-对应数据库中的TEXT列
-
-* **SlugField**
-
-用于存储URL友好的标识符（通常由字母、数字、下划线和连字符组成）
-
-通常用于生成URL的一部分
-
-可以设置max_length，也可以使用prepopulated_fields从其他字段自动生成
-
-* **IntegerField**
-
-用于存储整数
-
-可以设置取值范围（通过validators）
-
-* **FloatField**
-
-用于存储浮点数
-
-* **BooleanField**
-
-存储布尔值（True/False）
-
-* **DateTimeField**
-
-存储日期和时间
-
-常用参数：
-
-auto_now_add：当对象第一次创建时自动设置为当前时间
-
-auto_now：每次保存对象时自动更新为当前时间
-
-* **DateField**
-
-存储日期（不含时间）
-
-* **EmailField**
-
-存储电子邮件地址，实际上是CharField，但带有电子邮件验证
-
-* **URLField**
-
-存储URL，实际上是CharField，但带有URL验证
-
-* **FileField**
-
-用于上传文件
-
-需要指定upload_to参数，表示文件保存的路径
-
-* **ImageField**
-
-用于上传图片，是FileField的子类，增加了图片尺寸验证等功能
-
-需要Pillow库支持
-
-* **ForeignKey**
-
-用于定义多对一关系，例如一篇文章属于一个作者，一个作者可以有多篇文章
-
-需要指定关联的模型和on_delete参数（当被关联的对象删除时的行为）
-
-* **ManyToManyField**
-
-用于定义多对多关系，例如一篇文章可以有多个标签，一个标签也可以被多篇文章使用
-
-* **OneToOneField**
-
-用于定义一对一关系，例如一个用户对应一个个人资料
-
-* **DecimalField**
-
-用于存储固定精度的十进制数，适用于货币金额等
-
-必须指定max_digits（总位数）和decimal_places（小数位数）
-
-* **BinaryField**
-
-用于存储原始二进制数据（如图片、文件等），但不常用，通常更推荐使用FileField
-
-* **UUIDField**
-
-用于存储全局唯一标识符（UUID），通常作为主键使用
-
-* **DurationField**
-
-用于存储时间间隔
-
-* **GenericIPAddressField**
-
-用于存储IPv4或IPv6地址
-
-### 基于类的视图（Class-Based Views）提供了许多可以重写的方法，以便自定义视图的行为。
-
-* get_queryset: 用于指定视图所使用的查询集。默认返回模型的全部数据，通过重写可以过滤、排序等。
-
-* get_context_data: 用于向模板传递额外的上下文数据。
-
-* get: 处理GET请求的方法，可以重写以自定义GET请求的处理逻辑。
-
-* post: 处理POST请求的方法。
-
-* form_valid: 在表单验证通过时调用，可以在此处添加自定义逻辑（如保存对象时附加其他属性）。
-
-* form_invalid: 在表单验证失败时调用。
-
-* dispatch: 请求首先进入的方法，可以根据请求方法（GET、POST等）分发到对应的方法，也可以在此处进行一些初始操作。
-
-* get_object: 获取单个对象（用于DetailView、UpdateView等）。
-
-* get_success_url: 定义表单处理成功后重定向的URL。
-
-* get_form_class: 获取表单类，可以动态选择表单。
-
-* get_form_kwargs: 获取传递给表单的关键字参数。
-
-* get_template_names: 动态选择模板。
-
-* get_paginate_by: 动态设置分页大小。
-
-* get_ordering: 动态设置排序。
-
-* get_context_object_name: 设置上下文对象名称。
-
-### 常用重写方法总结表
-|  方法名  |  视图类型  |  作用  |  使用频率  |
-|  ----  | ----  | ----  | ----  |
-|get_queryset()	|所有	|自定义数据查询逻辑	|⭐⭐⭐⭐⭐
-|get_context_data()	|所有	|添加模板上下文数据	|⭐⭐⭐⭐⭐
-|get_object()	|DetailView, UpdateView	|自定义单个对象获取	|⭐⭐⭐⭐
-|form_valid()	|CreateView, UpdateView	|表单验证成功处理	|⭐⭐⭐⭐
-|get_form_class()	|表单视图	|动态选择表单类	|⭐⭐⭐
-|get_form_kwargs()	|表单视图	|自定义表单参数	|⭐⭐⭐
-|get_success_url()	|表单视图	|自定义成功跳转URL	|⭐⭐⭐
-|dispatch()	|所有	|请求预处理和权限检查	|⭐⭐⭐
-|get()	|所有	|自定义GET请求处理	|⭐⭐
-|post()	|所有	|自定义POST请求处理	|⭐⭐
-#### 最佳实践建议
-* 总是调用 super()：在重写方法时，确保调用父类方法
-
-* 合理使用查询优化：在 get_queryset() 中使用 select_related() 和 prefetch_related()
-
-* 保持方法单一职责：每个重写方法只负责一个明确的功能
-
-* 使用消息框架：在表单处理中给用户反馈
-
-* 考虑权限控制：在 dispatch() 或 get() 中进行权限检查
-
-
 ## Django 和 DRF 视图类完整指南
 ### Django 内置通用视图类
 * 基础视图类
@@ -236,8 +70,8 @@ class ArticleDeleteView(DeleteView):
 ```
 
 ## Django REST Framework 视图集
-* 基础视图类
-
+* 基础视图类*
+*
 |类名	|作用	|父类
 |  ----  |  ----  |  ----  |
 |APIView	|DRF 所有视图的基类	|Django View
@@ -343,7 +177,8 @@ class RetrieveUpdateViewSet(
 ```
 
 ## 完整示例对比
-```python Django ListView 示例
+### Django ListView 示例
+```python 
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -357,8 +192,9 @@ class ArticleListView(LoginRequiredMixin, ListView):
         return Article.objects.filter(
             author=self.request.user
         ).select_related('category')
-DRF ReadOnlyModelViewSet 示例
-python
+```
+### DRF ReadOnlyModelViewSet 示例
+```python 
 from rest_framework import viewsets, permissions
 from rest_framework.filters import SearchFilter, OrderingFilter
 

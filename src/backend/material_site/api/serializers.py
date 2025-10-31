@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from materials.models import Material, Category, MaterialTag
+from .models import Material, Category, MaterialTag
 
 
 class MaterialTagSerializer(serializers.ModelSerializer):
