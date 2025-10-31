@@ -1,6 +1,8 @@
 ```
 # 安装vue/cli
 $ npm install -g @vue/cli
+# 在项目目录下，运行以下命令来安装所有依赖（包括 vue-cli-service）
+npm install
 # 创建vue项目
 $ vue create .
 # 启动vue前端
