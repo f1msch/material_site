@@ -45,7 +45,7 @@ jobs:
         else
             echo "Tests failed or no tests configured"
         fi
-      working-directory: src/backend/material_site  # 指定后端目录
+      working-directory: src/backend/  # 指定后端目录
 #      数据库配置
 #    - name: Setup PostgreSQL
 #      uses: harmon758/postgresql-action@v1
