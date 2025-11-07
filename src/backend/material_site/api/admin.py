@@ -3,7 +3,7 @@ from .models import Category, Material, MaterialTag
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug']
+    list_display = ['name']
     search_fields = ['name']
 
 @admin.register(Material)

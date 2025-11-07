@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import MaterialList from '../views/MaterialList.vue'
+import MaterialManager from '../views/MaterialManager.vue'
 
 const routes = [
   {
@@ -10,7 +10,7 @@ const routes = [
   {
     path: '/materials',
     name: 'MaterialList',
-    component: MaterialList
+    component: MaterialManager
   }
 ]
 
