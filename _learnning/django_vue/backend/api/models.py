@@ -1,9 +1,9 @@
-from django.db import models
-from PIL import Image
-from io import BytesIO
-from django.core.files.base import ContentFile
-from django.contrib.auth.models import User
 import os
+from PIL import Image
+from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+from django.db import models
+from io import BytesIO
 
 
 class Category(models.Model):

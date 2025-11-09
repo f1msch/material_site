@@ -1,10 +1,11 @@
-from django.core.management.base import BaseCommand
-from ...models import Category, Material, MaterialTag
+import os
+import random
+from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-import os
-from datetime import datetime, timedelta
-import random
+from django.core.management.base import BaseCommand
+
+from ...models import Category, Material, MaterialTag
 
 
 class Command(BaseCommand):
