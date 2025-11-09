@@ -9,6 +9,22 @@ $ vue create .
 npm run serve
 ```
 
+```
+# 使用 Vite 官方命令创建项目
+npm create vue@latest frontend
+```
+```
+✔ Project name: … frontend
+✔ Add TypeScript? … No
+✔ Add JSX Support? … No  
+✔ Add Vue Router for Single Page Application development? … Yes
+✔ Add Pinia for state management? … Yes
+✔ Add Vitest for Unit testing? … No
+✔ Add an End-to-End Testing Solution? › No
+✔ Add ESLint for code quality? … No（建议先选 No，避免配置问题）
+✔ Add Prettier for code formatting? … No
+```
+
 **npm run serve (开发模式)**
 * 用途: 启动开发服务器，用于开发阶段
 

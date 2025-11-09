@@ -200,7 +200,7 @@ app.use(materialPlugin, {
 ## 🔧 Vuex/Pinia 高级技巧
 7. Vuex 模块化 + 类型安全
 ```javascript
-// store/modules/materials.js
+// stores/modules/materials.js
 const state = () => ({
   items: [],
   currentMaterial: null,
