@@ -4,7 +4,7 @@
       <img
         :src="material.thumbnail || material.preview_image || '/placeholder-image.jpg'"
         :alt="material.title"
-        @click="$router.push(`/materials/${material.id}`)"
+        @click="$router.push(`/material_site/${material.id}`)"
       />
       <div class="material-overlay">
         <button class="btn btn-primary" @click="handleDownload">下载</button>
@@ -19,7 +19,7 @@
     </div>
 
     <div class="material-info">
-      <h3 class="material-title" @click="$router.push(`/materials/${material.id}`)">
+      <h3 class="material-title" @click="$router.push(`/material_site/${material.id}`)">
         {{ material.title }}
       </h3>
 

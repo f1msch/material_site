@@ -13,7 +13,7 @@ export const useUploadStore = defineStore('upload', () => {
     uploadProgress.value = 0
 
     try {
-      const response = await $api.post('/api/materials/', formData, {
+      const response = await $api.post('/api/material_site/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
           const progress = Math.round(

@@ -91,6 +91,7 @@ class Material(models.Model):
 
     # 基础信息
     title = models.CharField(max_length=200, verbose_name='素材标题')
+    slug = models.SlugField(max_length=30, unique=True, verbose_name='URL标识')
     description = models.TextField(blank=True, verbose_name='素材描述')
     material_type = models.CharField(
         max_length=20,

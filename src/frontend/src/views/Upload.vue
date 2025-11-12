@@ -353,7 +353,7 @@ const handleSubmit = async () => {
     await uploadStore.uploadMaterial(uploadFormData)
     alert('上传成功！')
     resetForm()
-    router.push('/materials')
+    await router.push('/material_site')
   } catch (error) {
     console.error('上传失败:', error)
     alert('上传失败，请重试')
