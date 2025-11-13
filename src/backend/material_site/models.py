@@ -58,6 +58,17 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.slug:  # 如果slug为空
+            self.slug = slugify(self.name)
+        # 确保slug唯一
+        original_slug = self.slug
+        counter = 1
+        while Tag.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+            self.slug = f'{original_slug}-{counter}'
+            counter += 1
+        super().save(*args, **kwargs)
+
 
 class Material(models.Model):
     """素材主模型"""

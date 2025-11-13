@@ -45,8 +45,9 @@ export const useMaterialStore = defineStore('materials', () => {
           delete params[key]
         }
       })
+      console.log('params is ', params)
 
-      const response = await $api.get('/api/material_site/', { params })
+      const response = await $api.get('/api/materials/', { params })
       materials.value = response.data.results
       pagination.value = {
         current: page,
@@ -64,7 +65,7 @@ export const useMaterialStore = defineStore('materials', () => {
   const fetchMaterialDetail = async (materialId) => {
     loading.value = true
     try {
-      const response = await $api.get(`/api/material_site/${materialId}/`)
+      const response = await $api.get(`/api/materials/${materialId}/`)
       currentMaterial.value = response.data
       return response.data
     } catch (error) {
@@ -77,7 +78,7 @@ export const useMaterialStore = defineStore('materials', () => {
 
   const uploadMaterial = async (formData) => {
     try {
-      const response = await $api.post('/api/material_site/', formData, {
+      const response = await $api.post('/api/materials/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
 
@@ -91,7 +92,7 @@ export const useMaterialStore = defineStore('materials', () => {
 
   const favoriteMaterial = async (materialId) => {
     try {
-      await $api.post(`/api/material_site/${materialId}/favorite/`)
+      await $api.post(`/api/materials/${materialId}/favorite/`)
 
       const material = materials.value.find(m => m.id === materialId)
       if (material) {
@@ -111,7 +112,7 @@ export const useMaterialStore = defineStore('materials', () => {
 
   const downloadMaterial = async (materialId) => {
     try {
-      const response = await $api.post(`/api/material_site/${materialId}/download/`)
+      const response = await $api.post(`/api/materials/${materialId}/download/`)
 
       const material = materials.value.find(m => m.id === materialId)
       if (material) {

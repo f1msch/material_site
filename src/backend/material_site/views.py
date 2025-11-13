@@ -30,6 +30,11 @@ class MaterialViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'view_count', 'download_count', 'like_count', 'price']
     ordering = ['-created_at']
 
+    def list(self, request, *args, **kwargs):
+        print("原始查询集数量:", self.get_queryset().count())
+        print("过滤后查询集数量:", self.filter_queryset(self.get_queryset()).count())
+        return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
         queryset = Material.objects.filter(status='approved').select_related(
             'author', 'category'
