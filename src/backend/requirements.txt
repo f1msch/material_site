@@ -6,3 +6,4 @@ Pillow
 django-cleanup
 python-dotenv
 djangorestframework-simplejwt
+gunicorn
