@@ -1,4 +1,3 @@
 /.idea
 /.venv/
-/src/backend/users/migrations/
-/src/backend/material_site/migrations/
+/src/backend/.env

@@ -1,14 +1,72 @@
 import os
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
+
+import dj_database_url
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
+SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-secret-key-for-production')
 
-DEBUG = True
+# 调试模式
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+# 允许的主机
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+
+
+# 数据库配置函数
+def get_database_config():
+    """
+    根据环境变量选择数据库配置
+    优先级：DATABASE_URL > DB_ENGINE > 默认SQLite
+    """
+    # 如果提供了 DATABASE_URL（Railway 会自动提供）
+    if os.getenv('DATABASE_URL'):
+        return dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+        )
+
+    # 如果指定了数据库引擎
+    db_engine = os.getenv('DB_ENGINE', 'sqlite').lower()
+
+    if db_engine == 'postgresql':
+        return {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'mydatabase'),
+            'USER': os.getenv('DB_USER', 'myuser'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    elif db_engine == 'mysql':
+        return {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv('DB_NAME', 'mydatabase'),
+            'USER': os.getenv('DB_USER', 'myuser'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '3306'),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+            },
+        }
+    else:  # 默认使用 SQLite
+        return {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+
+
+# 应用数据库配置
+DATABASES = {
+    'default': get_database_config()
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -17,13 +75,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Third party apps
     'rest_framework',
     'corsheaders',
     'django_filters',
     'django_cleanup.apps.CleanupConfig',
-    
+
     # Local apps
     'users.apps.UsersConfig',
     'material_site.apps.MaterialSiteConfig',
@@ -59,13 +117,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
