@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -167,17 +168,14 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
-print("🔧 CORS 配置:")
-print(f"  - CORS_ALLOW_ALL_ORIGINS: {CORS_ALLOW_ALL_ORIGINS}")
-print(f"  - ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
 
 # Whitenoise 配置
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -189,3 +187,17 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+print("🔧 CORS 配置:")
+print(f"  - CORS_ALLOW_ALL_ORIGINS: {CORS_ALLOW_ALL_ORIGINS}")
+print(f"  - ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+if 'gunicorn' in sys.argv[0]:
+    try:
+        from django.db import connections
+        conn = connections['default']
+        conn.ensure_connection()
+        print("✅ 生产环境数据库连接成功")
+    except Exception as e:
+        print(f"❌ 生产环境数据库连接失败: {e}")
+        import traceback
+        traceback.print_exc()
