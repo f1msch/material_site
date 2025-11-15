@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:railway": "vite --mode production",
     "build": "vite build",
     "preview": "vite preview"
   },
