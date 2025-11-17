@@ -13,3 +13,7 @@ gunicorn==21.2.0
 whitenoise==6.6.0
 
 django-debug-toolbar==4.2.0
+
+python-alipay-sdk
+cryptography
+requests

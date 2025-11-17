@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     # Local apps
     'users.apps.UsersConfig',
     'material_site.apps.MaterialSiteConfig',
+    'payments.apps.PaymentsConfig',
 ]
 
 MIDDLEWARE = [
@@ -190,3 +191,24 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # SECURE_HSTS_PRELOAD = True
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE = True
+
+# 支付宝配置
+ALIPAY_APP_ID = '你的应用ID'
+ALIPAY_APP_PRIVATE_KEY = '''
+-----BEGIN RSA PRIVATE KEY-----
+你的应用私钥
+-----END RSA PRIVATE KEY-----
+'''
+ALIPAY_PUBLIC_KEY = '''
+-----BEGIN PUBLIC KEY-----
+支付宝公钥
+-----END PUBLIC KEY-----
+'''
+ALIPAY_RETURN_URL = 'http://yourdomain.com/payment/success/'
+ALIPAY_NOTIFY_URL = 'http://yourdomain.com/api/payments/notify/alipay/'
+
+# 微信支付配置
+WECHAT_APP_ID = '你的公众号APPID'
+WECHAT_MCH_ID = '你的商户号'
+WECHAT_API_KEY = '你的API密钥'
+WECHAT_NOTIFY_URL = 'http://yourdomain.com/api/payments/notify/wechat/'

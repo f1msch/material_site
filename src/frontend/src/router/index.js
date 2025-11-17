@@ -38,6 +38,14 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: () => import('@/views/Register.vue')
+  },
+  {
+    path: '/payment',
+    name: 'Payment',
+    component: () => import('@/views/Payment.vue'),
+    meta: {
+      title: '支付页面'
+    }
   }
 ]
 

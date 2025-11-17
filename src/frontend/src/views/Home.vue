@@ -15,6 +15,9 @@
           <router-link to="/login" class="btn btn-outline btn-large" v-else>
             立即登录
           </router-link>
+          <router-link to="/payment" class="btn btn-primary btn-large">
+            支付
+          </router-link>
         </div>
       </div>
     </section>
