@@ -212,3 +212,32 @@ WECHAT_APP_ID = '你的公众号APPID'
 WECHAT_MCH_ID = '你的商户号'
 WECHAT_API_KEY = '你的API密钥'
 WECHAT_NOTIFY_URL = 'http://yourdomain.com/api/payments/notify/wechat/'
+
+# 1. 配置缓存后端为 django-redis
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        # 连接地址：如果你的Redis没有密码，可以省略 `:密码@` 部分
+        # 如果你使用方案一（MSI安装），通常不需要密码，地址如下：
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        # 如果你使用Docker，并且想连接其他机器上的Redis，请替换IP。
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # 如果Redis设置了密码，取消注释并修改下面这行
+            # "PASSWORD": "your_redis_password_here",
+        },
+        # 可选：为所有缓存键添加一个前缀，防止多个项目冲突
+        "KEY_PREFIX": "myproject_"
+    }
+}
+
+# 2. （可选但推荐）将Session存储后端也设置为Redis
+# 这可以让用户的Session数据也存储在Redis中，速度比默认的数据库存储更快。
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# SESSION_CACHE_ALIAS = "default"
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'http://localhost:9200'  # 如果你使用 Docker 且 Django 运行在宿主机，请使用 'http://host.docker.internal:9200'
+    },
+}

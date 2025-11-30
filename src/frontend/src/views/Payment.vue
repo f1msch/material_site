@@ -40,118 +40,93 @@
         <h3>请扫码支付</h3>
         <img :src="qrCodeUrl" alt="支付二维码">
         <p>请使用{{ selectedMethod === 'alipay' ? '支付宝' : '微信' }}扫描二维码完成支付</p>
-        <button @click="showQRCode = false">关闭</button>
+        <button @click="closeQRCodeModal">关闭</button>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { createPayment, checkPaymentStatus } from '@/api/payment'
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { usePaymentStore } from '@/stores/payment'
+import { checkPaymentStatus } from '@/api/payment'
+import {useUserStore} from "@/stores/user.js";
 
-export default {
-  name: 'PaymentPage',
-  data() {
-    return {
-      selectedMethod: 'alipay',
-      processing: false,
-      showQRCode: false,
-      qrCodeUrl: '',
-      order: {
-        description: '素材网站VIP会员',
-        amount: '99.00'
-      },
-      currentOrderId: ''
-    }
-  },
-  methods: {
-    selectMethod(method) {
-      this.selectedMethod = method
-    },
+const router = useRouter()
+const paymentStore = usePaymentStore()
+const userStore = useUserStore()
 
-    async handlePayment() {
-      this.processing = true
+// 使用store中的状态
+const selectedMethod = computed(() => paymentStore.selectedMethod)
+const processing = computed(() => paymentStore.processing)
+const showQRCode = computed(() => paymentStore.showQRCode)
+const qrCodeUrl = computed(() => paymentStore.qrCodeUrl)
+const order = computed(() => paymentStore.order)
 
-      try {
-        const paymentData = {
-          // user_id: this.$store.state.user.id, // 从Vuex获取用户ID
-          amount: this.order.amount,
-          description: this.order.description,
-          payment_method: this.selectedMethod
-        }
+let pollInterval = null
 
-        const response = await createPayment(paymentData)
-        this.currentOrderId = response.data.order_id
+// 方法
+const selectMethod = (method) => {
+  paymentStore.setSelectedMethod(method)
+}
 
-        if (this.selectedMethod === 'alipay') {
-          // 支付宝支付 - 跳转到支付页面
-          window.location.href = response.data.pay_url
-        } else if (this.selectedMethod === 'wechat') {
-          // 微信支付 - 显示二维码
-          this.handleWechatPayment(response.data.payment_data)
-        }
-      } catch (error) {
-        console.error('支付失败:', error)
-        this.$message.error('支付请求失败，请重试')
-      } finally {
-        this.processing = false
+const handlePayment = async () => {
+  try {
+    // 假设从用户store获取用户ID
+    const userId = userStore.user
+    const paymentData = await paymentStore.createPayment(userId)
+
+    if (selectedMethod.value === 'alipay') {
+      // 支付宝支付 - 跳转到支付页面
+      window.location.href = paymentData.pay_url
+    } else if (selectedMethod.value === 'wechat') {
+      // 微信支付 - 显示二维码或调起微信支付
+      paymentStore.handleWechatPayment(paymentData.payment_data)
+
+      // 如果是显示二维码，开始轮询支付状态
+      if (paymentStore.showQRCode) {
+        startPollingPaymentStatus()
       }
-    },
-
-    handleWechatPayment(paymentData) {
-      if (typeof WeixinJSBridge !== 'undefined') {
-        // 在微信环境中直接调起支付
-        WeixinJSBridge.invoke(
-          'getBrandWCPayRequest',
-          paymentData,
-          (res) => {
-            if (res.err_msg === 'get_brand_wcpay_request:ok') {
-              this.$message.success('支付成功')
-              this.$router.push('/payment/success')
-            } else {
-              this.$message.error('支付取消或失败')
-            }
-          }
-        )
-      } else {
-        // 非微信环境，显示二维码
-        this.showWechatQRCode(paymentData)
-      }
-    },
-
-    showWechatQRCode(paymentData) {
-      // 这里应该根据支付数据生成二维码
-      // 可以使用qrcode.js库生成二维码
-      this.qrCodeUrl = this.generateQRCode(paymentData.pay_url)
-      this.showQRCode = true
-
-      // 开始轮询支付状态
-      this.pollPaymentStatus()
-    },
-
-    async pollPaymentStatus() {
-      const checkInterval = setInterval(async () => {
-        try {
-          const response = await checkPaymentStatus(this.currentOrderId)
-          if (response.data.status === 'paid') {
-            this.$message.success('支付成功')
-            this.showQRCode = false
-            clearInterval(checkInterval)
-            this.$router.push('/payment/success')
-          }
-        } catch (error) {
-          console.error('检查支付状态失败:', error)
-        }
-      }, 3000) // 每3秒检查一次
-    },
-
-    generateQRCode(url) {
-      // 使用二维码生成库生成二维码图片URL
-      // 这里返回一个示例URL，实际使用时需要真正生成二维码
-      return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`
     }
+  } catch (error) {
+    console.error('支付失败:', error)
+    // 这里可以使用UI框架的消息提示
+    alert('支付请求失败，请重试')
   }
 }
+
+const startPollingPaymentStatus = () => {
+  pollInterval = setInterval(async () => {
+    try {
+      const response = await checkPaymentStatus(paymentStore.currentOrderId)
+      if (response.data.status === 'paid') {
+        // 支付成功
+        alert('支付成功')
+        closeQRCodeModal()
+        clearInterval(pollInterval)
+        router.push('/payment/success')
+      }
+    } catch (error) {
+      console.error('检查支付状态失败:', error)
+    }
+  }, 3000) // 每3秒检查一次
+}
+
+const closeQRCodeModal = () => {
+  paymentStore.setShowQRCode(false)
+  if (pollInterval) {
+    clearInterval(pollInterval)
+    pollInterval = null
+  }
+}
+
+// 生命周期
+onUnmounted(() => {
+  if (pollInterval) {
+    clearInterval(pollInterval)
+  }
+})
 </script>
 
 <style scoped>

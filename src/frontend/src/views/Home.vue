@@ -123,8 +123,8 @@ onMounted(async () => {
   await Promise.all([
     materialStore.fetchMaterials(1),
     materialStore.fetchCategories(),
-    loadFeaturedData()
   ])
+  await loadFeaturedData()
 })
 
 const loadFeaturedData = async () => {
@@ -132,6 +132,7 @@ const loadFeaturedData = async () => {
     // 这里可以调用API获取特色分类和统计数据
     // 暂时使用模拟数据
     featuredCategories.value = materialStore.categories.slice(0, 6)
+    console.log('featuredCategories.value is ', featuredCategories.value)
 
     // 模拟统计数据
     stats.value = {

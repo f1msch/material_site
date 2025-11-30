@@ -146,8 +146,9 @@ export const useMaterialStore = defineStore('materials', () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await $api.get('/api/categories/')
-      categories.value = response.data
+        const response = await $api.get('/api/categories/')
+        categories.value = response.data
+        console.log('categories.value is ', categories.value)
     } catch (error) {
       console.error('获取分类失败:', error)
       throw error
