@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'material_site.apps.MaterialSiteConfig',
     'payments.apps.PaymentsConfig',
+    'storage.apps.StorageConfig',
 ]
 
 MIDDLEWARE = [
@@ -236,8 +237,26 @@ CACHES = {
 # SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 # SESSION_CACHE_ALIAS = "default"
 
+
 ELASTICSEARCH_DSL = {
     'default': {
         'hosts': 'http://localhost:9200'  # 如果你使用 Docker 且 Django 运行在宿主机，请使用 'http://host.docker.internal:9200'
     },
+}
+
+
+MINIO_CONFIG = {
+    'endpoint': 'your-minio-server:9000',
+    'access_key': 'your_minio_access_key',
+    'secret_key': 'your_minio_secret_key',
+    'bucket': 'hot-storage-bucket',
+    'secure': False  # 若为HTTPS则设为True
+}
+
+OSS_CONFIG = {
+    'endpoint': 'oss-cn-hangzhou.aliyuncs.com',  # 以阿里云OSS为例
+    'access_key': 'your_oss_access_key_id',
+    'secret_key': 'your_oss_secret_access_key',
+    'bucket': 'backup-storage-bucket',
+    'region': 'cn-hangzhou'
 }

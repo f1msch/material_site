@@ -28,3 +28,6 @@ redis
 # =======================
 elasticsearch-dsl
 # =======================
+django-storages
+minio
+boto3
