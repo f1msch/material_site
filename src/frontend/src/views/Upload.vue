@@ -213,24 +213,24 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useMaterialStore } from '@/stores/material_site'
-import { useUploadStore } from '@/stores/upload'
+<script lang="ts" setup>
+import {computed, onMounted, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {useMaterialStore} from '@/stores/material_site'
+import {useUploadStore} from '@/stores/upload'
 import UploadProgress from '@/components/UploadProgress.vue'
-import { formatFileSize } from '@/utils/helpers'
-import { FILE_ACCEPT_TYPES, MAX_FILE_SIZE } from '@/utils/constants'
+import {formatFileSize} from '@/utils/helpers'
+import {FILE_ACCEPT_TYPES, MAX_FILE_SIZE} from '@/utils/constants'
 
 const router = useRouter()
 const materialStore = useMaterialStore()
 const uploadStore = useUploadStore()
 
-const fileInput = ref(null)
-const selectedFile = ref(null)
-const tagInput = ref('')
-const thumbnailPreview = ref('')
-const previewImagePreview = ref('')
+const fileInput = ref<HTMLInputElement | null>(null)
+const selectedFile = ref<File | null>(null)
+const tagInput = ref<string>('')
+const thumbnailPreview = ref<string>('')
+const previewImagePreview = ref<string>('')
 
 const formData = ref({
   title: '',
@@ -251,11 +251,11 @@ const canSubmit = computed(() => {
   return selectedFile.value && formData.value.title.trim()
 })
 
-const getAcceptTypes = (type) => {
+const getAcceptTypes = (type: string): string => {
   return FILE_ACCEPT_TYPES[type] || '*'
 }
 
-const getFileTypeText = (type) => {
+const getFileTypeText = (type: string): string => {
   const types = {
     image: '图片',
     vector: '矢量图',
@@ -268,8 +268,8 @@ const getFileTypeText = (type) => {
   return types[type] || '所有'
 }
 
-const handleFileSelect = (event) => {
-  const file = event.target.files[0]
+const handleFileSelect = (event: Event): void => {
+  const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
 
   if (file.size > MAX_FILE_SIZE) {
@@ -280,36 +280,36 @@ const handleFileSelect = (event) => {
   selectedFile.value = file
 }
 
-const handleThumbnailSelect = (event) => {
-  const file = event.target.files[0]
+const handleThumbnailSelect = (event: Event): void => {
+  const file = (event.target as HTMLInputElement).files?.[0]
   if (file) {
     const reader = new FileReader()
-    reader.onload = (e) => {
-      thumbnailPreview.value = e.target.result
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      thumbnailPreview.value = e.target?.result as string
     }
     reader.readAsDataURL(file)
   }
 }
 
-const handlePreviewSelect = (event) => {
-  const file = event.target.files[0]
+const handlePreviewSelect = (event: Event): void => {
+  const file = (event.target as HTMLInputElement).files?.[0]
   if (file) {
     const reader = new FileReader()
-    reader.onload = (e) => {
-      previewImagePreview.value = e.target.result
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      previewImagePreview.value = e.target?.result as string
     }
     reader.readAsDataURL(file)
   }
 }
 
-const removeFile = () => {
+const removeFile = (): void => {
   selectedFile.value = null
   if (fileInput.value) {
     fileInput.value.value = ''
   }
 }
 
-const addTag = (event) => {
+const addTag = (event: Event): void => {
   event.preventDefault()
   const tag = tagInput.value.trim()
   if (tag && !formData.value.tags.includes(tag)) {
@@ -318,11 +318,11 @@ const addTag = (event) => {
   }
 }
 
-const removeTag = (index) => {
+const removeTag = (index: number): void => {
   formData.value.tags.splice(index, 1)
 }
 
-const handleSubmit = async () => {
+const handleSubmit = async (): Promise<void> => {
   if (!canSubmit.value) return
 
   const uploadFormData = new FormData()
@@ -360,7 +360,7 @@ const handleSubmit = async () => {
   }
 }
 
-const resetForm = () => {
+const resetForm = (): void => {
   formData.value = {
     title: '',
     description: '',

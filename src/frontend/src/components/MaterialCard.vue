@@ -51,19 +51,17 @@
   </div>
 </template>
 
-<script setup>
-import { useMaterialStore } from '@/stores/material_site'
+<script lang="ts" setup>
+import {useMaterialStore} from '@/stores/material_site'
+import type {Material} from '@/types'
 
-const props = defineProps({
-  material: {
-    type: Object,
-    required: true
-  }
-})
+const props = defineProps<{
+  material: Material
+}>()
 
 const materialStore = useMaterialStore()
 
-const handleFavorite = async () => {
+const handleFavorite = async (): Promise<void> => {
   try {
     await materialStore.favoriteMaterial(props.material.id)
   } catch (error) {
@@ -71,7 +69,7 @@ const handleFavorite = async () => {
   }
 }
 
-const handleDownload = async () => {
+const handleDownload = async (): Promise<void> => {
   try {
     const response = await materialStore.downloadMaterial(props.material.id)
     // 创建下载链接

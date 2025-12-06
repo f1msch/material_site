@@ -297,21 +297,21 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, reactive } from 'vue'
-import { useUserStore } from '@/stores/user'
-import { useMaterialStore } from '@/stores/material_site'
+<script lang="ts" setup>
+import {computed, onMounted, reactive, ref} from 'vue'
+import {useUserStore} from '@/stores/user'
+import {useMaterialStore} from '@/stores/material_site'
 import MaterialCard from '@/components/MaterialCard.vue'
-import { formatDate } from '@/utils/helpers'
+import {formatDate} from '@/utils/helpers'
 
 const userStore = useUserStore()
 const materialStore = useMaterialStore()
 
-const activeTab = ref('profile')
-const materialsTab = ref('published')
-const updatingProfile = ref(false)
-const loadingMaterials = ref(false)
-const avatarPreview = ref('')
+const activeTab = ref<string>('profile')
+const materialsTab = ref<string>('published')
+const updatingProfile = ref<boolean>(false)
+const loadingMaterials = ref<boolean>(false)
+const avatarPreview = ref<string>('')
 
 const tabs = [
   { id: 'profile', name: '个人信息', icon: '👤' },
@@ -327,10 +327,10 @@ const profileForm = reactive({
   website: userStore.user?.website || ''
 })
 
-const publishedMaterials = ref([])
-const draftMaterials = ref([])
-const pendingMaterials = ref([])
-const favorites = ref([])
+const publishedMaterials = ref<any[]>([])
+const draftMaterials = ref<any[]>([])
+const pendingMaterials = ref<any[]>([])
+const favorites = ref<any[]>([])
 
 const currentMaterials = computed(() => {
   switch (materialsTab.value) {
@@ -383,12 +383,12 @@ const loadFavorites = async () => {
   }
 }
 
-const handleAvatarSelect = (event) => {
-  const file = event.target.files[0]
+const handleAvatarSelect = (event: Event): void => {
+  const file = (event.target as HTMLInputElement).files?.[0]
   if (file) {
     const reader = new FileReader()
-    reader.onload = (e) => {
-      avatarPreview.value = e.target.result
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      avatarPreview.value = e.target?.result as string
     }
     reader.readAsDataURL(file)
   }

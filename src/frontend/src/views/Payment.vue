@@ -46,11 +46,11 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { usePaymentStore } from '@/stores/payment'
-import { checkPaymentStatus } from '@/api/payment'
+<script lang="ts" setup>
+import {computed, onUnmounted} from 'vue'
+import {useRouter} from 'vue-router'
+import {usePaymentStore} from '@/stores/payment'
+import {checkPaymentStatus} from '@/api/payment.ts'
 import {useUserStore} from "@/stores/user.js";
 
 const router = useRouter()
@@ -67,11 +67,11 @@ const order = computed(() => paymentStore.order)
 let pollInterval = null
 
 // 方法
-const selectMethod = (method) => {
+const selectMethod = (method: string): void => {
   paymentStore.setSelectedMethod(method)
 }
 
-const handlePayment = async () => {
+const handlePayment = async (): Promise<void> => {
   try {
     // 假设从用户store获取用户ID
     const userId = userStore.user
@@ -96,7 +96,7 @@ const handlePayment = async () => {
   }
 }
 
-const startPollingPaymentStatus = () => {
+const startPollingPaymentStatus = (): void => {
   pollInterval = setInterval(async () => {
     try {
       const response = await checkPaymentStatus(paymentStore.currentOrderId)
@@ -113,7 +113,7 @@ const startPollingPaymentStatus = () => {
   }, 3000) // 每3秒检查一次
 }
 
-const closeQRCodeModal = () => {
+const closeQRCodeModal = (): void => {
   paymentStore.setShowQRCode(false)
   if (pollInterval) {
     clearInterval(pollInterval)

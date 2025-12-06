@@ -167,7 +167,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useMaterialStore} from '@/stores/material_site'
@@ -177,16 +177,16 @@ const route = useRoute()
 const router = useRouter()
 const materialStore = useMaterialStore()
 
-const downloading = ref(false)
-const relatedMaterials = ref([])
+const downloading = ref<boolean>(false)
+const relatedMaterials = ref<any[]>([])
 
 onMounted(async () => {
   await materialStore.fetchMaterialDetail(route.params.id)
   await loadRelatedMaterials()
 })
 
-const getFileTypeIcon = (type) => {
-  const icons = {
+const getFileTypeIcon = (type: string): string => {
+  const icons: Record<string, string> = {
     image: '🖼️',
     vector: '📐',
     video: '🎬',
@@ -198,7 +198,7 @@ const getFileTypeIcon = (type) => {
   return icons[type] || '📎'
 }
 
-const formatDuration = (seconds) => {
+const formatDuration = (seconds: number): string => {
   const mins = Math.floor(seconds / 60)
   const secs = Math.floor(seconds % 60)
   return `${mins}:${secs.toString().padStart(2, '0')}`

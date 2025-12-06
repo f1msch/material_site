@@ -98,16 +98,16 @@
   </div>
 </template>
 
-<script setup>
-import { onMounted, ref, computed } from 'vue'
-import { useMaterialStore } from '@/stores/material_site'
-import { useUserStore } from '@/stores/user'
+<script lang="ts" setup>
+import {computed, onMounted, ref} from 'vue'
+import {useMaterialStore} from '@/stores/material_site'
+import {useUserStore} from '@/stores/user'
 import MaterialCard from '@/components/MaterialCard.vue'
 
 const materialStore = useMaterialStore()
 const userStore = useUserStore()
 
-const featuredCategories = ref([])
+const featuredCategories = ref<any[]>([])
 const stats = ref({
   totalMaterials: 0,
   totalDownloads: 0,
@@ -141,6 +141,8 @@ const loadFeaturedData = async () => {
       totalUsers: 432,
       featuredMaterials: 56
     }
+    console.log('stats.value 已设置:', stats.value)
+    console.log('loadFeaturedData 执行完成')
   } catch (error) {
     console.error('加载特色数据失败:', error)
   }

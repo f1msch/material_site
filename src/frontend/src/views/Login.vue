@@ -64,24 +64,24 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+<script lang="ts" setup>
+import {ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {useUserStore} from '@/stores/user'
 
 const router = useRouter()
 const userStore = useUserStore()
 
-const loading = ref(false)
-const error = ref('')
-const rememberMe = ref(false)
+const loading = ref<boolean>(false)
+const error = ref<string>('')
+const rememberMe = ref<boolean>(false)
 
 const loginData = ref({
   username: '',
   password: ''
 })
 
-const handleLogin = async () => {
+const handleLogin = async (): Promise<void> => {
   if (loading.value) return
 
   loading.value = true

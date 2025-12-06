@@ -1,17 +1,12 @@
 import os
+
 from django.db.models import Q
 from django.http import HttpResponse
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, filters
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.response import Response
 
 from .models import Material, Category
-from .models import Material, Category
-from .serializers import MaterialListSerializer, MaterialDetailSerializer, CategorySerializer
 from .serializers import MaterialSerializer, CategorySerializer
 
 
@@ -34,17 +29,17 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
 #
 #     @action(detail=True, methods=['post'])
 #     def download(self, request, pk=None):
-#         material = self.get_object()
-#         material.downloads += 1
-#         material.save()
-#         return Response({'downloads': material.downloads})
+#         material.ts = self.get_object()
+#         material.ts.downloads += 1
+#         material.ts.save()
+#         return Response({'downloads': material.ts.downloads})
 #
 #     @action(detail=True, methods=['post'])
 #     def like(self, request, pk=None):
-#         material = self.get_object()
-#         material.likes += 1
-#         material.save()
-#         return Response({'likes': material.likes})
+#         material.ts = self.get_object()
+#         material.ts.likes += 1
+#         material.ts.save()
+#         return Response({'likes': material.ts.likes})
 #
 
 from rest_framework.pagination import PageNumberPagination

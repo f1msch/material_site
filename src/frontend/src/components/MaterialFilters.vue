@@ -103,14 +103,15 @@
   </div>
 </template>
 
-<script setup>
-import { ref, watch } from 'vue'
-import { useMaterialStore } from '@/stores/material_site'
-import { debounce } from '@/utils/helpers'
+<script lang="ts" setup>
+import {ref, watch} from 'vue'
+import {useMaterialStore} from '@/stores/material_site'
+import {debounce} from '@/utils/helpers'
+import type {MaterialFilters} from '@/types'
 
 const materialStore = useMaterialStore()
 
-const localFilters = ref({
+const localFilters = ref<MaterialFilters>({
   search: '',
   category: '',
   tags: [],
@@ -128,15 +129,15 @@ const handleSearchInput = debounce(() => {
   updateFilters()
 }, 500)
 
-const updateFilters = () => {
+const updateFilters = (): void => {
   materialStore.updateFilters(localFilters.value)
 }
 
-const applyFilters = () => {
+const applyFilters = (): void => {
   materialStore.fetchMaterials(1)
 }
 
-const clearFilters = () => {
+const clearFilters = (): void => {
   localFilters.value = {
     search: '',
     category: '',
@@ -150,7 +151,7 @@ const clearFilters = () => {
   materialStore.fetchMaterials(1)
 }
 
-const toggleTag = (tagSlug) => {
+const toggleTag = (tagSlug: string): void => {
   const index = localFilters.value.tags.indexOf(tagSlug)
   if (index > -1) {
     localFilters.value.tags.splice(index, 1)
@@ -163,7 +164,7 @@ const toggleTag = (tagSlug) => {
 // 监听store的filters变化（比如从其他组件修改）
 watch(
   () => materialStore.filters,
-  (newFilters) => {
+    (newFilters: MaterialFilters) => {
     localFilters.value = { ...newFilters }
   },
   { deep: true }

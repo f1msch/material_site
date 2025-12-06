@@ -18,17 +18,11 @@
   </div>
 </template>
 
-<script setup>
-defineProps({
-  isUploading: {
-    type: Boolean,
-    default: false
-  },
-  progress: {
-    type: Number,
-    default: 0
-  }
-})
+<script lang="ts" setup>
+defineProps<{
+  isUploading: boolean
+  progress: number
+}>()
 </script>
 
 <style scoped>

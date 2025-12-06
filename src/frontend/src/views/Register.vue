@@ -92,7 +92,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useUserStore} from '@/stores/user'
@@ -100,9 +100,9 @@ import {useUserStore} from '@/stores/user'
 const router = useRouter()
 const userStore = useUserStore()
 
-const loading = ref(false)
-const error = ref('')
-const agreeTerms = ref(false)
+const loading = ref<boolean>(false)
+const error = ref<string>('')
+const agreeTerms = ref<boolean>(false)
 
 const registerData = ref({
   username: '',
@@ -118,7 +118,7 @@ const errors = ref({
   password_confirm: ''
 })
 
-const validateForm = () => {
+const validateForm = (): boolean => {
   let isValid = true
   errors.value = { username: '', email: '', password: '', password_confirm: '' }
 
@@ -156,7 +156,7 @@ const validateForm = () => {
   return isValid
 }
 
-const handleRegister = async () => {
+const handleRegister = async (): Promise<void> => {
   if (loading.value) return
 
   if (!validateForm()) {

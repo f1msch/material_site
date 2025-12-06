@@ -74,9 +74,9 @@
   </div>
 </template>
 
-<script setup>
-import { onMounted, ref, watch } from 'vue'
-import { useMaterialStore } from '@/stores/material_site'
+<script lang="ts" setup>
+import {onMounted, ref, watch} from 'vue'
+import {useMaterialStore} from '@/stores/material_site'
 import MaterialFilters from '@/components/MaterialFilters.vue'
 import MaterialCard from '@/components/MaterialCard.vue'
 import Pagination from '@/components/Pagination.vue'
@@ -92,11 +92,11 @@ onMounted(async () => {
   ])
 })
 
-const handlePageChange = (page) => {
+const handlePageChange = (page: number): void => {
   materialStore.fetchMaterials(page)
 }
 
-const handleSortChange = () => {
+const handleSortChange = (): void => {
   materialStore.fetchMaterials(1)
 }
 

@@ -45,32 +45,23 @@
   </div>
 </template>
 
-<script setup>
-import { computed } from 'vue'
+<script lang="ts" setup>
+import {computed} from 'vue'
 
-const props = defineProps({
-  current: {
-    type: Number,
-    required: true,
-    default: 1
-  },
-  total: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-  pageSize: {
-    type: Number,
-    default: 12
-  }
-})
+const props = defineProps<{
+  current: number
+  total: number
+  pageSize: number
+}>()
 
-const emit = defineEmits(['change'])
+const emit = defineEmits<{
+  change: [page: number]
+}>()
 
-const totalPages = computed(() => Math.ceil(props.total / props.pageSize))
+const totalPages = computed<number>(() => Math.ceil(props.total / props.pageSize))
 
-const visiblePages = computed(() => {
-  const pages = []
+const visiblePages = computed<number[]>(() => {
+  const pages: number[] = []
   const start = Math.max(1, props.current - 2)
   const end = Math.min(totalPages.value, props.current + 2)
 
@@ -81,15 +72,15 @@ const visiblePages = computed(() => {
   return pages
 })
 
-const showEllipsis = computed(() => {
+const showEllipsis = computed<boolean>(() => {
   return visiblePages.value[visiblePages.value.length - 1] < totalPages.value - 1
 })
 
-const showLastPage = computed(() => {
+const showLastPage = computed<boolean>(() => {
   return visiblePages.value[visiblePages.value.length - 1] < totalPages.value
 })
 
-const handlePageChange = (page) => {
+const handlePageChange = (page: number): void => {
   if (page >= 1 && page <= totalPages.value) {
     emit('change', page)
   }

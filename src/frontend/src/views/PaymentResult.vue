@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { checkPaymentStatus } from '@/api/payment'
+import {checkPaymentStatus} from '@/api/payment.ts'
 
 export default {
   name: 'PaymentResult',
