@@ -16,6 +16,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-secret-key-for-production')
 # 调试模式
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
+DJANGO_ENV = os.getenv('DJANGO_ENV', 'development')
+
 # 允许的主机
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 

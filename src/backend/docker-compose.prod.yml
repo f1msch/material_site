@@ -1,5 +1,7 @@
 services:
   backend:
+    env_file:
+      - .env.production  # 生产特定配置（会覆盖通用配置）
     build: .
     ports:
       - "8000:8000"
@@ -7,14 +9,19 @@ services:
       # Django 基础配置
       - DJANGO_SETTINGS_MODULE=backend.settings
       - SECRET_KEY=${SECRET_KEY:-django-insecure-!change-me!}
-      - DEBUG=${DEBUG:-False}
 
-      # 开发环境使用 SQLite（或开发数据库）
-      - DB_ENGINE=django.db.backends.sqlite3
-      - DB_NAME=/material-site/db.sqlite3
+      - DJANGO_ENV=production
+      - DEBUG=${DEBUG:-False}
+      # 生产环境 MySQL 配置
+      - DB_ENGINE=django.db.backends.mysql
+      - DB_HOST=${DB_HOST:-10.30.101.133}  # 支持环境变量覆盖
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-cloud1-5gzqbjdm656dd4f0}
+      - DB_USER=${DB_USER:-admin}
+      - DB_PASSWORD=${DB_PASSWORD:-Admin123456}
 
       # 可选：其他配置
-      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - ALLOWED_HOSTS=localhost,127.0.0.1,10.30.101.133
     volumes:
       # 挂载媒体文件目录（如果需要持久化）
       - ./media:/app/media
