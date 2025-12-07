@@ -2,7 +2,7 @@
 FROM python:3.10-slim
 
 # 第二行：工作目录
-WORKDIR /
+WORKDIR /material-site
 
 # 第三、四行：Python 环境变量
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -34,4 +34,4 @@ COPY . .
 EXPOSE 8000
 
 # 启动命令
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000"]

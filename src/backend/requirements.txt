@@ -16,7 +16,7 @@ psycopg2-binary==2.9.9
 # =======================
 # deployment
 gunicorn==21.2.0
-# whitenoise==6.6.0
+whitenoise==6.6.0
 # =======================
 # payment
 wechatpayv3
