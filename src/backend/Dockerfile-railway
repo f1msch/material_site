@@ -34,5 +34,6 @@ COPY . .
 EXPOSE 8000
 
 # 启动命令
-#CMD python manage.py migrate
+CMD python manage.py migrate
+CMD python init_data.py
 CMD gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000}
