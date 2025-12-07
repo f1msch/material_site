@@ -376,7 +376,7 @@ const loadFavorites = async () => {
     // 这里应该调用API获取收藏列表
     // 暂时使用模拟数据
     favorites.value = materialStore.materials
-      .filter(m => m.is_favorited)
+        .filter(m => m.is_favorite)
       .map(material => ({ id: material.id, material }))
   } catch (error) {
     console.error('加载收藏失败:', error)

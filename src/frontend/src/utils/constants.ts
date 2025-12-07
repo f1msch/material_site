@@ -15,7 +15,7 @@ export const LICENSE_TYPES = {
   'cc-by-sa': 'CC BY-SA'
 }
 
-export const FILE_ACCEPT_TYPES = {
+export const FILE_ACCEPT_TYPES: Record<string, string> = {
   image: 'image/*',
   vector: '.svg,.ai,.eps',
   video: 'video/*',

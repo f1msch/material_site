@@ -10,7 +10,7 @@
         <button class="btn btn-primary" @click="handleDownload">下载</button>
         <button
           class="btn btn-outline favorite-btn"
-          :class="{ 'favorited': material.is_favorited }"
+          :class="{ 'favorited': material.is_favorite }"
           @click="handleFavorite"
         >
           ♡ {{ material.favorite_count }}

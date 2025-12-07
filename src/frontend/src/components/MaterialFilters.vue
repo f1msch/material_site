@@ -10,7 +10,6 @@
           type="text"
           placeholder="搜索素材..."
           class="form-input"
-          @input="handleSearchInput"
         />
       </div>
 
@@ -85,7 +84,7 @@
           <span
             v-for="tag in materialStore.tags"
             :key="tag.id"
-            :class="['tag', { active: localFilters.tags.includes(tag.slug) }]"
+            :class="['tag', { active: localFilters.tags?.includes(tag.slug) }]"
             :style="{ backgroundColor: tag.color }"
             @click="toggleTag(tag.slug)"
           >
@@ -107,9 +106,18 @@
 import {ref, watch} from 'vue'
 import {useMaterialStore} from '@/stores/material_site'
 import {debounce} from '@/utils/helpers'
-import type {MaterialFilters} from '@/types'
 
 const materialStore = useMaterialStore()
+
+interface MaterialFilters {
+  category?: string
+  tags?: string[]
+  material_type?: string
+  license_type?: string
+  search?: string
+  min_price?: number | null
+  max_price?: number | null
+}
 
 const localFilters = ref<MaterialFilters>({
   search: '',
@@ -117,8 +125,6 @@ const localFilters = ref<MaterialFilters>({
   tags: [],
   material_type: '',
   license_type: '',
-  min_price: null,
-  max_price: null
 })
 
 // 初始化时同步store的筛选条件
@@ -152,11 +158,11 @@ const clearFilters = (): void => {
 }
 
 const toggleTag = (tagSlug: string): void => {
-  const index = localFilters.value.tags.indexOf(tagSlug)
-  if (index > -1) {
-    localFilters.value.tags.splice(index, 1)
+  const index = localFilters.value.tags?.indexOf(tagSlug)
+  if (index && index > -1) {
+    localFilters.value.tags?.splice(index, 1)
   } else {
-    localFilters.value.tags.push(tagSlug)
+    localFilters.value.tags?.push(tagSlug)
   }
   updateFilters()
 }

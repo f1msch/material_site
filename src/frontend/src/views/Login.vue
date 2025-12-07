@@ -91,11 +91,11 @@ const handleLogin = async (): Promise<void> => {
     await userStore.login(loginData.value)
 
     // 登录成功，跳转到首页或来源页面
-    const redirect = router.currentRoute.value.query.redirect || '/'
-    router.push(redirect)
+    const redirect = router.currentRoute.value.query.redirect?.[0] || '/'
+    await router.push(redirect)
 
   } catch (err) {
-    error.value = err.detail || err.message || '登录失败，请检查用户名和密码'
+    error.value = err && (err as any)?.detail || err && (err as any)?.message || '登录失败，请检查用户名和密码'
     console.error('登录失败:', err)
   } finally {
     loading.value = false

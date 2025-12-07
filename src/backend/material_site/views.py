@@ -1,13 +1,13 @@
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, Count
-from django.shortcuts import get_object_or_404
-from .models import Material, Category, Tag, Favorite, DownloadHistory
-from .serializers import *
+from rest_framework.response import Response
+
 from .filters import MaterialFilter
+from .models import DownloadHistory
+from .serializers import *
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -98,25 +98,31 @@ class MaterialViewSet(viewsets.ModelViewSet):
         """下载素材"""
         material = self.get_object()
 
-        # 记录下载历史
-        DownloadHistory.objects.create(
-            user=request.user,
-            material=material,
-            ip_address=self.get_client_ip(request)
-        )
+        if material.main_file:
+            # 记录下载历史
+            DownloadHistory.objects.create(
+                user=request.user,
+                material=material,
+                ip_address=self.get_client_ip(request)
+            )
 
-        # 更新下载计数
-        material.download_count += 1
-        material.save()
+            # TODO signal F表达式
+            # 更新下载计数
+            material.download_count += 1
+            material.save()
 
-        # 更新用户的下载统计
-        request.user.downloads_count += 1
-        request.user.save()
+            # 更新用户的下载统计
+            request.user.downloads_count += 1
+            request.user.save()
 
-        return Response({
-            'download_url': material.main_file.url,
-            'download_count': material.download_count
-        })
+            return Response({
+                'download_url': material.main_file.url,
+                'download_count': material.download_count
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'download_url': None
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['post'])
     def like(self, request, pk=None):

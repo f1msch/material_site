@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import {computed, ref} from 'vue'
+import {computed, ref, type Ref} from 'vue'
 import {
     downloadMaterialApi as downloadMaterialApi,
     favoriteMaterialApi,
@@ -13,7 +13,7 @@ import type {Category, Material, MaterialFilters, PaginationParams, Tag} from '@
 
 export const useMaterialStore = defineStore('materials', () => {
     const materials = ref<Material[]>([])
-    const currentMaterial = ref<Material | null>(null)
+    const currentMaterial: Ref<Material | null> = ref<Material | null>(null)
     const categories = ref<Category[]>([])
     const tags = ref<Tag[]>([])
     const loading = ref<boolean>(false)
@@ -102,13 +102,13 @@ export const useMaterialStore = defineStore('materials', () => {
 
             const material = materials.value.find((m: Material) => m.id === materialId)
             if (material) {
-                material.is_favorited = !material.is_favorited
-                material.favorite_count += material.is_favorited ? 1 : -1
+                material.is_favorite = !material.is_favorite
+                material.favorite_count += material.is_favorite ? 1 : -1
             }
 
             if (currentMaterial.value && currentMaterial.value.id === materialId) {
-                currentMaterial.value.is_favorited = !currentMaterial.value.is_favorited
-                currentMaterial.value.favorite_count += currentMaterial.value.is_favorited ? 1 : -1
+                currentMaterial.value.is_favorite = !currentMaterial.value.is_favorite
+                currentMaterial.value.favorite_count += currentMaterial.value.is_favorite ? 1 : -1
             }
         } catch (error) {
             console.error('收藏操作失败:', error)
@@ -119,7 +119,6 @@ export const useMaterialStore = defineStore('materials', () => {
     const downloadMaterial = async (materialId: number): Promise<{ download_url: string }> => {
         try {
             const response = await downloadMaterialApi(materialId)
-
 
             return response.data
         } catch (error) {

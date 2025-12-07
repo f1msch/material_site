@@ -62,10 +62,10 @@
 
           <!-- 分页 -->
           <Pagination
-            v-if="materialStore.pagination.total > 0"
-            :current="materialStore.pagination.current"
-            :total="materialStore.pagination.total"
-            :page-size="materialStore.pagination.pageSize"
+              v-if="(materialStore.pagination?.total ?? 0) > 0"
+              :current="materialStore.pagination.current || 1"
+              :page-size="materialStore.pagination.pageSize || 12"
+              :total="materialStore.pagination.total || 0"
             @change="handlePageChange"
           />
         </main>
@@ -77,9 +77,9 @@
 <script lang="ts" setup>
 import {onMounted, ref, watch} from 'vue'
 import {useMaterialStore} from '@/stores/material_site'
-import MaterialFilters from '@/components/MaterialFilters.vue'
+import * as MaterialFilters from '@/components/MaterialFilters.vue'
 import MaterialCard from '@/components/MaterialCard.vue'
-import Pagination from '@/components/Pagination.vue'
+import * as Pagination from '@/components/Pagination.vue'
 
 const materialStore = useMaterialStore()
 const sortBy = ref('-created_at')

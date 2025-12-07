@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import {ref} from 'vue'
-import {uploadFileApi, uploadMaterialFileApi} from '@/api/material'
+import {uploadMaterialFileApi} from '@/api/material'
 
 export const useUploadStore = defineStore('upload', () => {
     const uploadProgress = ref(0)
@@ -13,12 +13,10 @@ export const useUploadStore = defineStore('upload', () => {
         uploadProgress.value = 0
 
         try {
-            const response = await uploadMaterialFileApi(formData, (progress) => {
+            const response = await uploadMaterialFileApi(formData, (progress: number) => {
                 uploadProgress.value = progress
                 if (onProgress) onProgress(progress)
             })
-
-            await uploadFileHandler(formData.main_file)
 
             uploadedMaterials.value.push(response.data)
             return response.data
@@ -30,20 +28,6 @@ export const useUploadStore = defineStore('upload', () => {
             uploadProgress.value = 0
         }
     }
-
-    const handleFileUpload = (event: Event): void => {
-        // 可以在这里添加文件类型、大小校验
-    }
-
-    const uploadFileHandler = async (fileUrl: FormData | string): Promise<any> => {
-        try {
-            const response = await uploadFileApi(fileUrl as FormData)
-            return response.data
-        } catch (error) {
-            console.error('上传失败:', error)
-        }
-    }
-
     const addToQueue = (file: File): void => {
         uploadQueue.value.push({
             id: Date.now(),

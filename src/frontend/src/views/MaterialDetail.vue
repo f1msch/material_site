@@ -49,7 +49,7 @@
               </button>
               <button
                   class="btn favorite-btn"
-                  :class="{ 'favorited': materialStore.currentMaterial.is_favorited }"
+                  :class="{ 'favorite': materialStore.currentMaterial.is_favorite }"
                   @click="handleFavorite"
               >
                 ♡ {{ materialStore.currentMaterial.favorite_count }}
@@ -181,7 +181,7 @@ const downloading = ref<boolean>(false)
 const relatedMaterials = ref<any[]>([])
 
 onMounted(async () => {
-  await materialStore.fetchMaterialDetail(route.params.id)
+  await materialStore.fetchMaterialDetail(Number(route.params.id))
   await loadRelatedMaterials()
 })
 
@@ -209,15 +209,18 @@ const handleDownload = async () => {
 
   downloading.value = true
   try {
-    const response = await materialStore.downloadMaterial(materialStore.currentMaterial.id)
-
-    // 创建下载链接
-    const link = document.createElement('a')
-    link.href = response.download_url
-    link.download = materialStore.currentMaterial.title
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    if (materialStore.currentMaterial) {
+      const response = await materialStore.downloadMaterial(materialStore.currentMaterial.id)
+      if (response) {
+        // 创建下载链接
+        const link = document.createElement('a')
+        link.href = response.download_url
+        link.download = materialStore.currentMaterial.title
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    }
   } catch (error) {
     console.error('下载失败:', error)
     alert('下载失败，请重试')
@@ -228,7 +231,9 @@ const handleDownload = async () => {
 
 const handleFavorite = async () => {
   try {
-    await materialStore.favoriteMaterial(materialStore.currentMaterial.id)
+    if (materialStore.currentMaterial) {
+      await materialStore.favoriteMaterial(materialStore.currentMaterial.id)
+    }
   } catch (error) {
     console.error('收藏失败:', error)
   }
@@ -236,8 +241,10 @@ const handleFavorite = async () => {
 
 const handleLike = async () => {
   try {
-    // 这里可以调用点赞API
-    materialStore.currentMaterial.like_count += 1
+    if (materialStore.currentMaterial) {
+      // 这里可以调用点赞API
+      materialStore.currentMaterial.like_count += 1
+    }
   } catch (error) {
     console.error('点赞失败:', error)
   }
@@ -246,7 +253,7 @@ const handleLike = async () => {
 const loadRelatedMaterials = async () => {
   // 模拟相关素材数据
   relatedMaterials.value = materialStore.materials
-      .filter(m => m.id !== materialStore.currentMaterial.id)
+      .filter(m => materialStore.currentMaterial && m.id !== materialStore.currentMaterial.id)
       .slice(0, 4)
 }
 </script>

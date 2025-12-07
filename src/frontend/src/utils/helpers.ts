@@ -19,7 +19,7 @@ export const formatDate = (dateString: string): string => {
 
 // 防抖函数
 export const debounce = (func: Function, wait: number): Function => {
-    let timeout: NodeJS.Timeout | null = null
+    let timeout: ReturnType<typeof setTimeout> | null = null
     return function executedFunction(...args: any[]) {
     const later = () => {
         if (timeout) clearTimeout(timeout)
@@ -31,7 +31,7 @@ export const debounce = (func: Function, wait: number): Function => {
 }
 
 // 生成随机颜色
-export const getRandomColor = (): string => {
-  const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c']
-  return colors[Math.floor(Math.random() * colors.length)]
-}
+// export const getRandomColor = (): string => {
+//   const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c']
+//   return colors[Math.floor(Math.random() * colors.length)]
+// }

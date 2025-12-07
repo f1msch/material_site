@@ -7,8 +7,8 @@
       </div>
 
       <UploadProgress
-        :is-uploading="uploadStore.isUploading"
-        :progress="uploadStore.uploadProgress"
+          :is-uploading="uploadStore.isUploading"
+          :progress="uploadStore.uploadProgress"
       />
 
       <div class="upload-form">
@@ -21,13 +21,13 @@
               <label class="form-label">选择文件 *</label>
               <div class="file-upload">
                 <input
-                  type="file"
-                  ref="fileInput"
-                  @change="handleFileSelect"
-                  :accept="getAcceptTypes(formData.material_type)"
-                  class="file-input"
+                    ref="fileInput"
+                    :accept="getAcceptTypes(formData.material_type)"
+                    class="file-input"
+                    type="file"
+                    @change="handleFileSelect"
                 />
-                <div class="file-dropzone" @click="$refs.fileInput.click()">
+                <div class="file-dropzone" @click="($event.target as any).$refs.fileInput?.click()">
                   <div v-if="!selectedFile" class="dropzone-content">
                     <div class="upload-icon">📁</div>
                     <p>点击选择文件或拖拽文件到这里</p>
@@ -65,21 +65,21 @@
             <div class="form-group">
               <label class="form-label">标题 *</label>
               <input
-                v-model="formData.title"
-                type="text"
-                placeholder="请输入素材标题"
-                class="form-input"
-                required
+                  v-model="formData.title"
+                  class="form-input"
+                  placeholder="请输入素材标题"
+                  required
+                  type="text"
               />
             </div>
 
             <div class="form-group">
               <label class="form-label">描述</label>
               <textarea
-                v-model="formData.description"
-                placeholder="描述你的素材内容、特点和使用场景..."
-                class="form-input form-textarea"
-                rows="4"
+                  v-model="formData.description"
+                  class="form-input form-textarea"
+                  placeholder="描述你的素材内容、特点和使用场景..."
+                  rows="4"
               ></textarea>
             </div>
 
@@ -88,9 +88,9 @@
               <select v-model="formData.category" class="form-input form-select">
                 <option value="">选择分类</option>
                 <option
-                  v-for="category in materialStore.categories"
-                  :key="category.id"
-                  :value="category.id"
+                    v-for="category in materialStore.categories"
+                    :key="category.id"
+                    :value="category.id"
                 >
                   {{ category.name }}
                 </option>
@@ -101,18 +101,18 @@
               <label class="form-label">标签</label>
               <div class="tags-input">
                 <input
-                  v-model="tagInput"
-                  type="text"
-                  placeholder="输入标签后按回车添加"
-                  class="form-input"
-                  @keydown.enter="addTag"
+                    v-model="tagInput"
+                    class="form-input"
+                    placeholder="输入标签后按回车添加"
+                    type="text"
+                    @keydown.enter="addTag"
                 />
                 <div class="tags-list">
                   <span
-                    v-for="(tag, index) in formData.tags"
-                    :key="index"
-                    class="tag"
-                    @click="removeTag(index)"
+                      v-for="(tag, index) in formData.tags"
+                      :key="index"
+                      class="tag"
+                      @click="removeTag(index)"
                   >
                     {{ tag }} ×
                   </span>
@@ -138,21 +138,21 @@
             <div class="form-group" v-if="formData.license_type === 'premium'">
               <label class="form-label">价格 (¥)</label>
               <input
-                v-model.number="formData.price"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-                class="form-input"
+                  v-model.number="formData.price"
+                  class="form-input"
+                  min="0"
+                  placeholder="0.00"
+                  step="0.01"
+                  type="number"
               />
             </div>
 
             <div class="form-group">
               <label class="checkbox-label">
                 <input
-                  v-model="formData.is_featured"
-                  type="checkbox"
-                  class="checkbox"
+                    v-model="formData.is_featured"
+                    class="checkbox"
+                    type="checkbox"
                 />
                 <span>设为推荐素材</span>
               </label>
@@ -166,26 +166,26 @@
             <div class="form-group">
               <label class="form-label">缩略图</label>
               <input
-                type="file"
-                @change="handleThumbnailSelect"
-                accept="image/*"
-                class="form-input"
+                  accept="image/*"
+                  class="form-input"
+                  type="file"
+                  @change="handleThumbnailSelect"
               />
               <div v-if="thumbnailPreview" class="image-preview">
-                <img :src="thumbnailPreview" alt="缩略图预览" class="preview-image" />
+                <img :src="thumbnailPreview" alt="缩略图预览" class="preview-image"/>
               </div>
             </div>
 
             <div class="form-group">
               <label class="form-label">预览图</label>
               <input
-                type="file"
-                @change="handlePreviewSelect"
-                accept="image/*"
-                class="form-input"
+                  accept="image/*"
+                  class="form-input"
+                  type="file"
+                  @change="handlePreviewSelect"
               />
               <div v-if="previewImagePreview" class="image-preview">
-                <img :src="previewImagePreview" alt="预览图预览" class="preview-image" />
+                <img :src="previewImagePreview" alt="预览图预览" class="preview-image"/>
               </div>
             </div>
           </div>
@@ -193,16 +193,16 @@
           <!-- 提交按钮 -->
           <div class="form-actions">
             <button
-              type="submit"
-              :disabled="!canSubmit || uploadStore.isUploading"
-              class="btn btn-primary btn-large"
+                :disabled="!canSubmit || uploadStore.isUploading"
+                class="btn btn-primary btn-large"
+                type="submit"
             >
               {{ uploadStore.isUploading ? '上传中...' : '发布素材' }}
             </button>
             <button
-              type="button"
-              @click="resetForm"
-              class="btn btn-outline"
+                class="btn btn-outline"
+                type="button"
+                @click="resetForm"
             >
               重置表单
             </button>
@@ -232,7 +232,18 @@ const tagInput = ref<string>('')
 const thumbnailPreview = ref<string>('')
 const previewImagePreview = ref<string>('')
 
-const formData = ref({
+interface MaterialFormData {
+  title: string
+  description: string
+  material_type: string
+  category: string
+  tags: string[]
+  license_type: string
+  price: number
+  is_featured: boolean
+}
+
+const formData = ref<MaterialFormData>({
   title: '',
   description: '',
   material_type: 'image',
@@ -256,7 +267,7 @@ const getAcceptTypes = (type: string): string => {
 }
 
 const getFileTypeText = (type: string): string => {
-  const types = {
+  const types: Record<string, string> = {
     image: '图片',
     vector: '矢量图',
     video: '视频',
@@ -311,7 +322,7 @@ const removeFile = (): void => {
 
 const addTag = (event: Event): void => {
   event.preventDefault()
-  const tag = tagInput.value.trim()
+  const tag: string = tagInput.value.trim()
   if (tag && !formData.value.tags.includes(tag)) {
     formData.value.tags.push(tag)
     tagInput.value = ''
@@ -328,7 +339,9 @@ const handleSubmit = async (): Promise<void> => {
   const uploadFormData = new FormData()
 
   // 添加文件
-  uploadFormData.append('main_file', selectedFile.value)
+  if (selectedFile.value) {
+    uploadFormData.append('main_file', selectedFile.value)
+  }
 
   // 添加表单数据
   Object.keys(formData.value).forEach(key => {
@@ -337,13 +350,18 @@ const handleSubmit = async (): Promise<void> => {
         uploadFormData.append('tags', tag)
       })
     } else {
-      uploadFormData.append(key, formData.value[key])
+      const value = formData.value[key as keyof typeof formData.value]
+      if (typeof value === 'string') {
+        uploadFormData.append(key, value)
+      } else {
+        uploadFormData.append(key, value.toString())
+      }
     }
   })
 
   // 添加预览文件
   if (thumbnailPreview.value) {
-    const thumbnailFile = fileInput.value?.files[0]
+    const thumbnailFile = fileInput.value?.files?.[0]
     if (thumbnailFile) {
       uploadFormData.append('thumbnail', thumbnailFile)
     }
@@ -409,7 +427,7 @@ const resetForm = (): void => {
   background: white;
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .form-section {

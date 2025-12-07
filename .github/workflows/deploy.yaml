@@ -1,0 +1,43 @@
+name: Deploy to CloudBase
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm install -g @cloudbase/cli
+          cd frontend && npm install
+          cd ../backend && pip install -r requirements.txt
+
+      - name: Build Vue
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Deploy to CloudBase
+        env:
+          TCB_SECRET_ID: ${{ secrets.TCB_SECRET_ID }}
+          TCB_SECRET_KEY: ${{ secrets.TCB_SECRET_KEY }}
+        run: |
+          tcb login --secret-id $TCB_SECRET_ID --secret-key $TCB_SECRET_KEY
+          
+          # 部署前端到Pages
+          npx tcb pages deploy frontend/dist --dir
+          
+          # 部署后端到云函数
+          cp -r backend/* cloudfunctions/django/
+          tcb functions:deploy django
