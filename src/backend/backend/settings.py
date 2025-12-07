@@ -178,10 +178,15 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOWED_ORIGINS = [
+    "https://cloud1-5gzqbjdm656dd4f0-1321559842.tcloudbaseapp.com",
     "http://localhost:3001",
     "http://127.0.0.1:3001",
     "http://localhost:8080",
     "http://127.0.0.1:8080",
+]
+CSRF_TRUSTED_ORIGINS = [
+    'https://cloud1-5gzqbjdm656dd4f0-1321559842.tcloudbaseapp.com',
+    'https://materialsite-production.up.railway.app',
 ]
 
 # Whitenoise 配置
