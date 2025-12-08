@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import {computed, ref} from 'vue'
-import {getCurrentUser, login as loginApi, register as registerApi, updateProfile as updateProfileApi} from '@/api/user'
-import type {LoginForm, RegisterForm, User} from '@/types'
+import {loginApi, registerApi, updateProfileApi} from '@/api/user'
+import type {LoginForm, RegisterForm} from '@/types'
 
 export const useUserStore = defineStore('user', () => {
     const user = ref<User | null>(null)
@@ -33,7 +33,7 @@ export const useUserStore = defineStore('user', () => {
         try {
             const response = await registerApi(userData)
             return response.data
-        } catch (error: any) {
+        } catch (error: AxiosError) {
             throw error.response?.data || error
         } finally {
             loading.value = false

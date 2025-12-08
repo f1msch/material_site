@@ -16,59 +16,18 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-secret-key-for-production')
 # 调试模式
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-DJANGO_ENV = os.getenv('DJANGO_ENV', 'development')
-
 # 允许的主机
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-
-
-# 数据库配置函数
-def get_database_config():
-    """
-    根据环境变量选择数据库配置
-    优先级：DATABASE_URL > DB_ENGINE > 默认SQLite
-    """
-    # 如果提供了 DATABASE_URL（Railway 会自动提供）
-    if os.getenv('DATABASE_URL'):
-        return dj_database_url.config(
-            default=os.getenv('DATABASE_URL'),
-            conn_max_age=600,
-        )
-
-    # 如果指定了数据库引擎
-    db_engine = os.getenv('DB_ENGINE', 'sqlite').lower()
-
-    if db_engine == 'postgresql':
-        return {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'mydatabase'),
-            'USER': os.getenv('DB_USER', 'myuser'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '5432'),
-        }
-    elif db_engine == 'mysql':
-        return {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.getenv('DB_NAME', 'mydatabase'),
-            'USER': os.getenv('DB_USER', 'myuser'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'mypassword'),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '3306'),
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-            },
-        }
-    else:  # 默认使用 SQLite
-        return {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# 跨域
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
 
 
 # 应用数据库配置
 DATABASES = {
-    'default': get_database_config()
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+    )
 }
 
 INSTALLED_APPS = [
@@ -103,8 +62,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
     {
@@ -176,18 +133,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
-
-CORS_ALLOWED_ORIGINS = [
-    "https://cloud1-5gzqbjdm656dd4f0-1321559842.tcloudbaseapp.com",
-    "http://localhost:3001",
-    "http://127.0.0.1:3001",
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-]
-CSRF_TRUSTED_ORIGINS = [
-    'https://cloud1-5gzqbjdm656dd4f0-1321559842.tcloudbaseapp.com',
-    'https://materialsite-production.up.railway.app',
-]
 
 # Whitenoise 配置
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

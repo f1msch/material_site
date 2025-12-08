@@ -96,6 +96,7 @@
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useUserStore} from '@/stores/user'
+import type {RegisterForm} from "@/types";
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -104,7 +105,7 @@ const loading = ref<boolean>(false)
 const error = ref<string>('')
 const agreeTerms = ref<boolean>(false)
 
-const registerData = ref({
+const registerData = ref<RegisterForm>({
   username: '',
   email: '',
   password: '',
@@ -176,7 +177,7 @@ const handleRegister = async (): Promise<void> => {
     })
 
     // 跳转到首页
-    router.push('/')
+    await router.push('/')
 
   } catch (err) {
     if (err.username) {
