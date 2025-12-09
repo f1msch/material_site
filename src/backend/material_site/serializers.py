@@ -1,9 +1,17 @@
 from rest_framework import serializers
 from .models import Material, Category, Tag, Favorite
 from users.serializers import UserSerializer
+from src.backend.exceptions import ValidationError
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """
+    分类序列化器
+    用于分类数据的序列化和反序列化
+    """
     material_count = serializers.IntegerField(source='materials.count', read_only=True)
 
     class Meta:
@@ -13,12 +21,18 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """标签序列化器"""
+
     class Meta:
         model = Tag
         fields = ['id', 'name', 'slug', 'color', 'created_at']
 
 
 class MaterialListSerializer(serializers.ModelSerializer):
+    """
+    素材列表序列化器
+    用于素材列表展示，包含基本信息
+    """
     author = UserSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
@@ -34,7 +48,16 @@ class MaterialListSerializer(serializers.ModelSerializer):
             'file_size_display', 'dimensions', 'created_at', 'is_favorited'
         ]
 
-    def get_is_favorited(self, obj):
+    def get_is_favorited(self, obj: Material) -> bool:
+        """
+        获取当前用户是否收藏了该素材
+
+        Args:
+            obj: Material实例
+
+        Returns:
+            bool: 是否已收藏
+        """
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return obj.favorites.filter(user=request.user).exists()
@@ -42,6 +65,8 @@ class MaterialListSerializer(serializers.ModelSerializer):
 
 
 class MaterialDetailSerializer(MaterialListSerializer):
+    """素材详情序列化器"""
+
     class Meta:
         model = Material
         fields = MaterialListSerializer.Meta.fields + [
@@ -51,12 +76,15 @@ class MaterialDetailSerializer(MaterialListSerializer):
 
 
 class MaterialCreateSerializer(serializers.ModelSerializer):
-    # 重写tags字段，接受字符串列表
+    """
+    素材创建序列化器
+    用于创建新素材，处理文件上传和标签
+    """
     tags = serializers.ListField(
         child=serializers.CharField(max_length=50),
         required=False,
         default=[],
-        write_only=True  # 只在创建时使用
+        write_only=True
     )
 
     class Meta:
@@ -67,70 +95,104 @@ class MaterialCreateSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ('author', 'slug', 'status', 'file_size')
 
-    def validate_tags(self, value):
-        """验证tags字段"""
-        print("🔹 validate_tags 被调用")
-        print("接收的tags:", value)
+    def validate_title(self, value: str) -> str:
+        """验证标题"""
+        if len(value.strip()) < 2:
+            raise serializers.ValidationError("标题至少需要2个字符")
+        if len(value) > 200:
+            raise serializers.ValidationError("标题不能超过200个字符")
+        return value.strip()
 
+    def validate_tags(self, value: list) -> list:
+        """
+        验证标签数据
+
+        Args:
+            value: 标签列表
+
+        Returns:
+            list: 清理后的标签列表
+
+        Raises:
+            ValidationError: 标签格式错误
+        """
         if not isinstance(value, list):
-            raise serializers.ValidationError("标签必须是列表格式")
+            raise ValidationError("标签必须是列表格式")
 
-        # 清理标签名称
         cleaned_tags = []
         for tag_name in value:
             if tag_name and isinstance(tag_name, str) and tag_name.strip():
-                cleaned_tags.append(tag_name.strip())
+                cleaned_tag = tag_name.strip()[:30]  # 限制长度
+                if cleaned_tag not in cleaned_tags:  # 去重
+                    cleaned_tags.append(cleaned_tag)
 
-        print("清理后的tags:", cleaned_tags)
         return cleaned_tags
 
-    def create(self, validated_data):
-        print("🔹 create 方法开始执行")
+    def validate_price(self, value: float) -> float:
+        """验证价格"""
+        if value < 0:
+            raise serializers.ValidationError("价格不能为负数")
+        if value > 1000000:  # 限制最大价格
+            raise serializers.ValidationError("价格不能超过1,000,000")
+        return round(value, 2)
 
-        # 1. 取出tags数据
-        tags_data = validated_data.pop('tags', [])
-        print("准备处理的tags数据:", tags_data)
+    def create(self, validated_data: dict) -> Material:
+        """
+        创建素材记录
 
-        # 2. 创建素材记录（material表）
-        print("创建Material记录...")
-        material = Material.objects.create(**validated_data)
-        print(f"✅ Material创建成功, ID: {material.id}")
+        Args:
+            validated_data: 验证后的数据
 
-        # 3. 处理标签（tags表 + 关联表）
-        if tags_data:
-            tag_objects = []
-            for tag_name in tags_data:
-                print(f"处理标签: '{tag_name}'")
+        Returns:
+            Material: 创建的素材实例
+        """
+        logger.info(f"Creating material with data: {validated_data.keys()}")
 
-                # 获取或创建标签（tags表）
-                tag, created = Tag.objects.get_or_create(
-                    name=tag_name.lower(),  # 统一小写存储
-                    defaults={'name': tag_name.lower()}
-                )
-                tag_objects.append(tag)
+        try:
+            # 1. 取出标签数据
+            tags_data = validated_data.pop('tags', [])
 
-                if created:
-                    print(f"  ✅ 创建新标签: {tag.name} (ID: {tag.id})")
-                else:
-                    print(f"  🔹 使用现有标签: {tag.name} (ID: {tag.id})")
+            # 2. 创建素材记录
+            material = Material.objects.create(**validated_data)
+            logger.info(f"Material created: {material.id}")
 
-            # 建立多对多关联
-            print("建立标签关联...")
-            material.tags.set(tag_objects)
-            print(f"✅ 关联完成: {material.title} ↔ {len(tag_objects)}个标签")
-        else:
-            print("⚠️ 没有标签数据")
+            # 3. 处理标签
+            if tags_data:
+                tag_objects = []
+                for tag_name in tags_data:
+                    tag, created = Tag.objects.get_or_create(
+                        name=tag_name.lower(),
+                        defaults={'name': tag_name.lower()}
+                    )
+                    tag_objects.append(tag)
 
-        return material
+                # 建立多对多关联
+                material.tags.set(tag_objects)
+                logger.info(f"Tags associated: {len(tag_objects)} tags")
 
-    def to_representation(self, instance):
-        """响应数据中显示标签名称"""
+            return material
+
+        except Exception as e:
+            logger.error(f"Failed to create material: {str(e)}")
+            raise ValidationError(f"创建素材失败: {str(e)}")
+
+    def to_representation(self, instance: Material) -> dict:
+        """
+        序列化实例为字典
+
+        Args:
+            instance: Material实例
+
+        Returns:
+            dict: 序列化后的数据
+        """
         data = super().to_representation(instance)
         data['tags'] = [tag.name for tag in instance.tags.all()]
         return data
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    """收藏序列化器"""
     material = MaterialListSerializer(read_only=True)
 
     class Meta:

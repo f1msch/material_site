@@ -1,35 +1,24 @@
+"""
+Django项目配置文件 - 简化版
+只保留必要配置，去除默认值
+"""
+
 import os
-import sys
 from datetime import timedelta
 from pathlib import Path
-
 import dj_database_url
 from dotenv import load_dotenv
 
-# 加载环境变量
+# ========== 基础配置 ==========
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-secret-key-for-production')
-
-# 调试模式
+SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
-# 允许的主机
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-# 跨域
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
-
-
-# 应用数据库配置
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
-        conn_max_age=600,
-    )
-}
-
+# ========== 应用配置 ==========
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,19 +27,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third party apps
+    # 第三方应用
     'rest_framework',
     'corsheaders',
     'django_filters',
     'django_cleanup.apps.CleanupConfig',
 
-    # Local apps
+    # 本地应用
     'users.apps.UsersConfig',
     'material_site.apps.MaterialSiteConfig',
-    'payments.apps.PaymentsConfig',
-    'storage.apps.StorageConfig',
 ]
 
+# ========== 中间件配置 ==========
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -61,7 +49,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # 自定义中间件
+    'backend.middleware.RequestValidationMiddleware',
+    'backend.middleware.LoggingMiddleware',
+    'backend.middleware.ErrorHandlingMiddleware',
 ]
+
+# ========== URL和模板配置 ==========
+ROOT_URLCONF = 'backend.urls'
+WSGI_APPLICATION = 'backend.wsgi.application'
 
 TEMPLATES = [
     {
@@ -79,45 +76,42 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+# ========== 数据库配置 ==========
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3'),
+        conn_max_age=600,
+    )
+}
 
+# ========== 密码验证 ==========
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
 ]
 
+# ========== 国际化 ==========
 LANGUAGE_CODE = 'zh-hans'
 TIME_ZONE = 'Asia/Shanghai'
 USE_I18N = True
 USE_TZ = True
 
+# ========== 静态文件和媒体文件 ==========
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+# ========== 自定义用户模型 ==========
 AUTH_USER_MODEL = 'users.User'
 
+# ========== REST Framework配置 ==========
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -129,86 +123,91 @@ REST_FRAMEWORK = {
     ],
 }
 
+# ========== JWT配置 ==========
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
 }
 
-# Whitenoise 配置
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# ========== CORS配置 ==========
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3001').split(',')
+CORS_ALLOW_CREDENTIALS = True
 
-# # 安全设置
-# SECURE_SSL_REDIRECT = True
-# SECURE_HSTS_SECONDS = 31536000  # 1 year
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+# ========== 缓存配置 ==========
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/0'),
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         },
+#         "KEY_PREFIX": "material_site_"
+#     }
+# }
 
-# 支付宝配置
-ALIPAY_APP_ID = '你的应用ID'
-ALIPAY_APP_PRIVATE_KEY = '''
------BEGIN RSA PRIVATE KEY-----
-你的应用私钥
------END RSA PRIVATE KEY-----
-'''
-ALIPAY_PUBLIC_KEY = '''
------BEGIN PUBLIC KEY-----
-支付宝公钥
------END PUBLIC KEY-----
-'''
-ALIPAY_RETURN_URL = 'http://yourdomain.com/payment/success/'
-ALIPAY_NOTIFY_URL = 'http://yourdomain.com/api/payments/notify/alipay/'
+# ========== 日志配置 ==========
+# 创建日志目录
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(exist_ok=True)
 
-# 微信支付配置
-WECHAT_APP_ID = '你的公众号APPID'
-WECHAT_MCH_ID = '你的商户号'
-WECHAT_API_KEY = '你的API密钥'
-WECHAT_NOTIFY_URL = 'http://yourdomain.com/api/payments/notify/wechat/'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
 
-# 1. 配置缓存后端为 django-redis
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        # 连接地址：如果你的Redis没有密码，可以省略 `:密码@` 部分
-        # 如果你使用方案一（MSI安装），通常不需要密码，地址如下：
-        "LOCATION": "redis://127.0.0.1:6379/0",
-        # 如果你使用Docker，并且想连接其他机器上的Redis，请替换IP。
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            # 如果Redis设置了密码，取消注释并修改下面这行
-            # "PASSWORD": "your_redis_password_here",
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
         },
-        # 可选：为所有缓存键添加一个前缀，防止多个项目冲突
-        "KEY_PREFIX": "myproject_"
-    }
-}
-
-# 2. （可选但推荐）将Session存储后端也设置为Redis
-# 这可以让用户的Session数据也存储在Redis中，速度比默认的数据库存储更快。
-# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-# SESSION_CACHE_ALIAS = "default"
-
-
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': 'http://localhost:9200'  # 如果你使用 Docker 且 Django 运行在宿主机，请使用 'http://host.docker.internal:9200'
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
     },
-}
 
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOGS_DIR / 'django.log',
+            'maxBytes': 10 * 1024 * 1024,  # 10MB
+            'backupCount': 10,
+            'formatter': 'verbose',
+        },
+        'api_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOGS_DIR / 'api.log',
+            'maxBytes': 10 * 1024 * 1024,
+            'backupCount': 10,
+            'formatter': 'verbose',
+        },
+    },
 
-MINIO_CONFIG = {
-    'endpoint': 'your-minio-server:9000',
-    'access_key': 'your_minio_access_key',
-    'secret_key': 'your_minio_secret_key',
-    'bucket': 'hot-storage-bucket',
-    'secure': False  # 若为HTTPS则设为True
-}
-
-OSS_CONFIG = {
-    'endpoint': 'oss-cn-hangzhou.aliyuncs.com',  # 以阿里云OSS为例
-    'access_key': 'your_oss_access_key_id',
-    'secret_key': 'your_oss_secret_access_key',
-    'bucket': 'backup-storage-bucket',
-    'region': 'cn-hangzhou'
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+        'backend.middleware': {
+            'handlers': ['console', 'api_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'material_site': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
 }
